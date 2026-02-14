@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Poultry Stock Management PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+:root {
+    --bg-color: #1e3c72;
+    --card-bg: rgba(0, 0, 0, 0.4);
+    --text-color: #ffffff;
+    --sidebar-bg: rgba(0, 0, 0, 0.5);
+    --input-bg: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.light-mode {
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-color: #1e3c72;
+    --sidebar-bg: #1e3c72;
+    --input-bg: #ffffff;
+    --border-color: #ddd;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* --- LOGIN PAGE ANIMATED BG --- */
+#loginPage {
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #f39c12, #d35400);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.bg-icons { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.icon { position: absolute; font-size: 2rem; opacity: 0.3; animation: float 10s linear infinite; }
+@keyframes float {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.3; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 40px; border-radius: 20px; width: 380px; text-align: center;
+    backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3); color: white;
+}
+
+.login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; }
+.login-box button { width: 100%; padding: 12px; background: #ffcc00; border: none; border-radius: 10px; color: #1e3c72; font-weight: 600; cursor: pointer; }
+
+/* --- DASHBOARD STYLES --- */
+.dashboard { display: none; height: 100vh; }
+.main { display: flex; height: 100%; }
+.sidebar { width: 230px; background: var(--sidebar-bg); padding: 20px; transition: 0.3s; z-index: 10; }
+.sidebar button { width: 100%; padding: 10px; margin: 5px 0; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 8px; cursor: pointer; text-align: left; }
+.sidebar button:hover { background: rgba(255,255,255,0.2); }
+
+.content { flex: 1; padding: 30px; overflow-y: auto; }
+.card { background: var(--card-bg); padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); margin: 5px 0; }
+
+button.action { padding: 6px 12px; background: #00c6ff; border: none; border-radius: 6px; color: white; cursor: pointer; margin-right: 5px; }
+.logout { background: #e74c3c !important; color: white !important; }
+.toggle-mode { background: #f39c12 !important; font-weight: bold; margin-top: 20px !important; }
+
+table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+.total-box { font-size: 18px; margin-top: 10px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; border-left: 5px solid #ffcc00; }
+.pending-badge { background: #ffcc00; color: black; padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+
+/* Audit Log Styling */
+.history-log { margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; max-height: 200px; overflow-y: auto; font-size: 13px; border: 1px dashed #ffcc00; }
+.history-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffcc00; }
+</style>
+</head>
+
+<body>
+
+<div id="loginPage">
+    <div class="bg-icons" id="bgIcons"></div>
+    <div class="login-box">
+        <h2>🐔 Poultry PRO 🥚</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Enter Dashboard</button>
+        <p id="loginError" style="color:#ffcc00;margin-top:10px;"></p>
+    </div>
+</div>
+
+<div class="dashboard" id="dashboard">
+    <div class="main">
+        <div class="sidebar">
+            <h3 id="roleTitle" style="color: white; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px;"></h3>
+            <button onclick="showSection('stockSection')" id="stockBtn">📦 Add Stock 🐔</button>
+            <button onclick="showSection('sellSection')">💰 Sell Items 🥚</button>
+            <button onclick="showSection('recordSection')">📊 Sales Records</button>
+            <button onclick="showSection('profitSection')" id="profitBtn">📈 Profit & Loss</button>
+            <button onclick="resetData()" id="resetBtn">⚠️ Reset System</button>
+            <button onclick="toggleTheme()" class="toggle-mode">🌓 Switch Theme</button>
+            <button onclick="logout()" class="logout">🚪 Logout</button>
+        </div>
+
+        <div class="content">
+            <div id="approvalSection" class="card" style="display:none; border-left: 5px solid #ffcc00;">
+                <h2 style="color: #ffcc00;">⏳ Pending Edit Approvals</h2>
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Item</th><th>Old Qty</th><th>New Qty</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="approvalTable"></tbody>
+                </table>
+            </div>
+
+            <div id="stockSection" class="card">
+                <h2>📦 Add Stock</h2>
+                <div class="total-box">
+                    <p>Current: <span id="adminTotalChicken">0</span> Kg 🐔 | <span id="adminTotalEgg">0</span> 🥚</p>
+                </div>
+                <h4 style="margin-top:20px;">Chicken Stock</h4>
+                <input type="number" id="chickenKg" placeholder="Kg">
+                <input type="number" id="chickenGram" placeholder="Grams">
+                <input type="number" id="chickenRateInput" placeholder="Rate/Kg">
+                <button class="action" onclick="addChickenStock()">Add Chicken</button>
+                <h4 style="margin-top:20px;">Egg Stock</h4>
+                <input type="number" id="eggStockInput" placeholder="Qty">
+                <input type="number" id="eggRateInput" placeholder="Rate/Egg">
+                <button class="action" onclick="addEggStock()">Add Eggs</button>
+            </div>
+
+            <div id="sellSection" class="card" style="display:none;">
+                <h2>💰 Sell Items</h2>
+                <div class="total-box">
+                    <p>Available: <strong><span id="totalChicken">0</span> Kg 🐔</strong> | <strong><span id="totalEgg">0</span> 🥚</strong></p>
+                </div>
+                <h4 style="margin-top:20px;">Sell Chicken</h4>
+                <input type="number" id="sellKg" placeholder="Kg">
+                <input type="number" id="sellGram" placeholder="Grams">
+                <button class="action" onclick="sellChicken()">Sell Chicken</button>
+                <h4 style="margin-top:20px;">Sell Eggs</h4>
+                <input type="number" id="sellEggQty" placeholder="Qty">
+                <button class="action" onclick="sellEgg()">Sell Eggs</button>
+                <div class="total-box" style="margin-top:20px;">Revenue: ₹<span id="totalAmountDisplay">0</span></div>
+            </div>
+
+            <div id="recordSection" class="card" style="display:none;">
+                <h2>📊 Sales Records</h2>
+                <div style="margin-bottom: 15px;">
+                    <button class="action" onclick="downloadCSV()">Download CSV</button>
+                    <button class="action" style="background:#28a745" onclick="downloadExcel()">Download Excel</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Item</th><th>Qty</th><th>Amount</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="recordTable"></tbody>
+                </table>
+                <div id="adminHistoryCard" class="history-log" style="display:none;">
+                    <h4>🕒 Audit History (Admin Only)</h4>
+                    <div id="historyItems"></div>
+                </div>
+            </div>
+
+            <div id="profitSection" class="card" style="display:none;">
+                <h2>📈 Profit & Loss</h2>
+                <input type="number" id="inventoryCost" placeholder="Inventory Costs">
+                <input type="number" id="employeeSalary" placeholder="Employee Salary">
+                <button class="action" onclick="calculateProfit()">Calculate</button>
+                <div class="total-box" style="margin-top: 20px;">
+                    <p>Total Sales: ₹<span id="profitSales">0</span></p>
+                    <p>Total Expenses: ₹<span id="totalExpenses">0</span></p>
+                    <p style="font-weight: bold; color: #ffcc00;">Net Profit: ₹<span id="netProfit">0</span></p>
+                </div>
+                <canvas id="profitChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- UI ENHANCEMENTS ---
+function createIcons() {
+    const container = document.getElementById('bgIcons');
+    const icons = ['🐔', '🥚', '🍗', '🐣'];
+    for(let i=0; i<15; i++) {
+        let span = document.createElement('span');
+        span.className = 'icon';
+        span.innerText = icons[Math.floor(Math.random()*icons.length)];
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        span.style.animationDelay = (Math.random() * 5) + 's';
+        container.appendChild(span);
+    }
+}
+createIcons();
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+
+// --- DATA LOGIC ---
+let chickenStock = parseFloat(localStorage.getItem('chickenStock')) || 0;
+let eggStock = parseInt(localStorage.getItem('eggStock')) || 0;
+let chickenRate = parseFloat(localStorage.getItem('chickenRate')) || 0;
+let eggRate = parseFloat(localStorage.getItem('eggRate')) || 0;
+let records = JSON.parse(localStorage.getItem('records')) || [];
+let historyLogs = JSON.parse(localStorage.getItem('historyLogs')) || [];
+let pendingApprovals = JSON.parse(localStorage.getItem('pendingApprovals')) || [];
+let role = "";
+let chart;
+
+function saveData() {
+    localStorage.setItem('chickenStock', chickenStock);
+    localStorage.setItem('eggStock', eggStock);
+    localStorage.setItem('chickenRate', chickenRate);
+    localStorage.setItem('eggRate', eggRate);
+    localStorage.setItem('records', JSON.stringify(records));
+    localStorage.setItem('historyLogs', JSON.stringify(historyLogs));
+    localStorage.setItem('pendingApprovals', JSON.stringify(pendingApprovals));
+}
+
+function login() {
+    const userVal = document.getElementById("username").value;
+    const passVal = document.getElementById("password").value;
+    if (userVal === "admin" && passVal === "admin123") role = "admin";
+    else if (userVal === "sales" && passVal === "sales123") role = "sales";
+    else { document.getElementById("loginError").innerText = "Invalid Credentials!"; return; }
+
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("roleTitle").innerText = role.toUpperCase() + " PANEL";
+    
+    document.getElementById("stockBtn").style.display = (role === "admin") ? "block" : "none";
+    document.getElementById("profitBtn").style.display = (role === "admin") ? "block" : "none";
+    document.getElementById("resetBtn").style.display = (role === "admin") ? "block" : "none";
+    document.getElementById("adminHistoryCard").style.display = (role === "admin") ? "block" : "none";
+    
+    if (role === "sales") showSection('sellSection'); else showSection('stockSection');
+    updateTotals(); updateTable(); updateApprovalTable(); updateHistory();
+}
+
+function logout() { location.reload(); }
+
+function showSection(id) {
+    ['stockSection', 'sellSection', 'recordSection', 'profitSection'].forEach(s => document.getElementById(s).style.display = "none");
+    document.getElementById(id).style.display = "block";
+    updateTotals();
+}
+
+function addChickenStock() {
+    let kg = parseFloat(document.getElementById("chickenKg").value) || 0;
+    let gram = parseFloat(document.getElementById("chickenGram").value) || 0;
+    let rate = parseFloat(document.getElementById("chickenRateInput").value);
+    if (!rate) return alert("Enter rate");
+    chickenStock += kg + (gram / 1000);
+    chickenRate = rate;
+    historyLogs.unshift(`${new Date().toLocaleString()}: Stock Added (+${kg}.${gram}kg Chicken)`);
+    saveData(); updateTotals(); updateHistory(); alert("Stock Added!");
+}
+
+function addEggStock() {
+    let qty = parseInt(document.getElementById("eggStockInput").value) || 0;
+    let rate = parseFloat(document.getElementById("eggRateInput").value);
+    if (!rate) return alert("Enter rate");
+    eggStock += qty;
+    eggRate = rate;
+    historyLogs.unshift(`${new Date().toLocaleString()}: Stock Added (+${qty} Eggs)`);
+    saveData(); updateTotals(); updateHistory(); alert("Stock Added!");
+}
+
+function sellChicken() {
+    let weight = (parseFloat(document.getElementById("sellKg").value) || 0) + (parseFloat(document.getElementById("sellGram").value) || 0) / 1000;
+    if (weight <= 0 || weight > chickenStock) return alert("Invalid Qty");
+    chickenStock -= weight;
+    records.push({ date: new Date().toLocaleString(), item: "Chicken", qty: weight.toFixed(2), amt: weight * chickenRate });
+    saveData(); updateTable(); updateTotals();
+}
+
+function sellEgg() {
+    let qty = parseInt(document.getElementById("sellEggQty").value) || 0;
+    if (qty <= 0 || qty > eggStock) return alert("Invalid Qty");
+    eggStock -= qty;
+    records.push({ date: new Date().toLocaleString(), item: "Eggs", qty: qty, amt: qty * eggRate });
+    saveData(); updateTable(); updateTotals();
+}
+
+function updateTotals() {
+    document.getElementById("totalChicken").innerText = chickenStock.toFixed(2);
+    document.getElementById("totalEgg").innerText = eggStock;
+    document.getElementById("adminTotalChicken").innerText = chickenStock.toFixed(2);
+    document.getElementById("adminTotalEgg").innerText = eggStock;
+    document.getElementById("totalAmountDisplay").innerText = records.reduce((s, r) => s + r.amt, 0).toFixed(2);
+}
+
+function updateTable() {
+    const tableBody = document.getElementById("recordTable");
+    tableBody.innerHTML = "";
+    records.forEach((r, i) => {
+        let isPending = pendingApprovals.some(p => p.recordIndex === i);
+        tableBody.innerHTML += `<tr><td>${r.date}</td><td>${r.item}</td><td>${r.qty} ${isPending ? '<span class="pending-badge">PENDING</span>' : ''}</td><td>₹${r.amt.toFixed(2)}</td><td>
+            <button class="action" onclick="editRecord(${i})" ${isPending ? 'disabled' : ''}>Edit</button>
+            <button class="action" style="background:red" onclick="deleteRecord(${i})">Del</button>
+        </td></tr>`;
+    });
+}
+
+function editRecord(index) {
+    let newQty = parseFloat(prompt("Enter new quantity:", records[index].qty));
+    if (isNaN(newQty)) return;
+    if (role === "admin") applyEdit(index, newQty, "Admin Direct Edit");
+    else {
+        pendingApprovals.push({ recordIndex: index, oldQty: records[index].qty, newQty: newQty, item: records[index].item, date: new Date().toLocaleString() });
+        saveData(); updateTable(); alert("Sent for Approval!");
+    }
+}
+
+function applyEdit(index, newQty, source) {
+    let r = records[index];
+    let diff = newQty - r.qty;
+    let rate = (r.item === "Chicken") ? chickenRate : eggRate;
+    if (r.item === "Chicken") chickenStock -= diff; else eggStock -= diff;
+    r.qty = newQty; r.amt = newQty * rate;
+    historyLogs.unshift(`${new Date().toLocaleString()}: [${source}] ${r.item} Changed to ${newQty}`);
+    saveData(); updateTable(); updateTotals(); updateHistory();
+}
+
+function updateApprovalTable() {
+    const tableBody = document.getElementById("approvalTable");
+    if(!tableBody) return;
+    tableBody.innerHTML = "";
+    pendingApprovals.forEach((p, i) => {
+        tableBody.innerHTML += `<tr><td>${p.date}</td><td>${p.item}</td><td>${p.oldQty}</td><td>${p.newQty}</td><td>
+            <button class="action" style="background:green" onclick="processApproval(${i}, true)">Approve</button>
+            <button class="action" style="background:red" onclick="processApproval(${i}, false)">Reject</button>
+        </td></tr>`;
+    });
+    document.getElementById("approvalSection").style.display = (role === "admin" && pendingApprovals.length > 0) ? "block" : "none";
+}
+
+function processApproval(idx, approved) {
+    if (approved) applyEdit(pendingApprovals[idx].recordIndex, pendingApprovals[idx].newQty, "Seller Edit Approved");
+    pendingApprovals.splice(idx, 1);
+    saveData(); updateApprovalTable(); updateTable(); updateHistory();
+}
+
+function deleteRecord(index) {
+    if (role !== "admin") return alert("Admin only");
+    let r = records[index];
+    if (r.item === "Chicken") chickenStock += parseFloat(r.qty); else eggStock += parseInt(r.qty);
+    records.splice(index, 1);
+    saveData(); updateTable(); updateTotals();
+}
+
+function updateHistory() {
+    const container = document.getElementById("historyItems");
+    if(!container) return;
+    container.innerHTML = historyLogs.map(log => `<div class="history-item">${log}</div>`).join("");
+}
+
+function calculateProfit() {
+    let sales = records.reduce((s, r) => s + r.amt, 0);
+    let inv = parseFloat(document.getElementById("inventoryCost").value) || 0;
+    let sal = parseFloat(document.getElementById("employeeSalary").value) || 0;
+    let exp = inv + sal;
+    let net = sales - exp;
+    
+    // Update the UI Text
+    document.getElementById("profitSales").innerText = sales.toFixed(2);
+    document.getElementById("totalExpenses").innerText = exp.toFixed(2);
+    document.getElementById("netProfit").innerText = net.toFixed(2);
+    
+    // Update Chart
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById("profitChart"), {
+        type: 'bar',
+        data: { labels: ["Sales", "Expenses", "Net Profit"], datasets: [{ data: [sales, exp, net], backgroundColor: ["#2ecc71", "#e74c3c", "#3498db"] }] }
+    });
+}
+
+function downloadCSV() {
+    let csv = "Date,Item,Qty,Amount\n" + records.map(r => `${r.date},${r.item},${r.qty},${r.amt}`).join("\n");
+    let blob = new Blob([csv], { type: "text/csv" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Report.csv"; link.click();
+}
+
+function downloadExcel() {
+    let ws = XLSX.utils.json_to_sheet(records);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sales");
+    XLSX.writeFile(wb, "Report.xlsx");
+}
+
+function resetData() {
+    if (prompt("Admin Password:") === "admin123") { localStorage.clear(); location.reload(); }
+}
+</script>
+</body>
+</html>
