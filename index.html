@@ -1,105 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Poultry Stock Management PRO</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Poultry Stock Management PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<style>
-:root {
-    --bg-color: #1e3c72;
-    --card-bg: rgba(0, 0, 0, 0.4);
-    --text-color: #ffffff;
-    --sidebar-bg: rgba(0, 0, 0, 0.5);
-    --input-bg: rgba(255, 255, 255, 0.1);
-    --border-color: rgba(255, 255, 255, 0.1);
-}
+    <style>
+        :root {
+            --bg-color: #1e3c72;
+            --card-bg: rgba(0, 0, 0, 0.4);
+            --text-color: #ffffff;
+            --sidebar-bg: rgba(0, 0, 0, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-yellow: #ffcc00;
+        }
 
-.light-mode {
-    --bg-color: #f0f2f5;
-    --card-bg: #ffffff;
-    --text-color: #1e3c72;
-    --sidebar-bg: #1e3c72;
-    --input-bg: #ffffff;
-    --border-color: #ddd;
-}
+        .light-mode {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #1e3c72;
+            --sidebar-bg: #1e3c72;
+            --input-bg: #ffffff;
+            --border-color: #ddd;
+        }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
 
-/* --- LOGIN PAGE ANIMATED BG --- */
-#loginPage {
-    background: linear-gradient(-45deg, #1e3c72, #2a5298, #f39c12, #d35400);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        /* --- LOGIN PAGE --- */
+        #loginPage {
+            background: linear-gradient(-45deg, #1e3c72, #2a5298, #f39c12, #d35400);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-.bg-icons { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-.icon { position: absolute; font-size: 2rem; opacity: 0.3; animation: float 10s linear infinite; }
-@keyframes float {
-    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.3; }
-    90% { opacity: 0.3; }
-    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-}
+        .bg-icons { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .icon { position: absolute; font-size: 2rem; opacity: 0.3; animation: float 10s linear infinite; }
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
 
-.login-box {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 40px; border-radius: 20px; width: 380px; text-align: center;
-    backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3); color: white;
-}
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center;
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); color: white;
+        }
 
-.login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; }
-.login-box button { width: 100%; padding: 12px; background: #ffcc00; border: none; border-radius: 10px; color: #1e3c72; font-weight: 600; cursor: pointer; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; font-size: 16px; }
+        .login-box button { width: 100%; padding: 12px; background: var(--accent-yellow); border: none; border-radius: 10px; color: #1e3c72; font-weight: 600; cursor: pointer; }
 
-/* --- DASHBOARD STYLES --- */
-.dashboard { display: none; height: 100vh; }
-.main { display: flex; height: 100%; }
-.sidebar { width: 230px; background: var(--sidebar-bg); padding: 20px; transition: 0.3s; z-index: 10; }
-.sidebar button { width: 100%; padding: 10px; margin: 5px 0; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 8px; cursor: pointer; text-align: left; }
-.sidebar button:hover { background: rgba(255,255,255,0.2); }
+        /* --- DASHBOARD LAYOUT --- */
+        .dashboard { display: none; height: 100vh; }
+        .main { display: flex; height: 100%; flex-direction: row; }
 
-.content { flex: 1; padding: 30px; overflow-y: auto; }
-.card { background: var(--card-bg); padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .sidebar-container { position: relative; display: flex; flex-direction: column; background: var(--sidebar-bg); }
 
-input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); margin: 5px 0; }
+        .sidebar { 
+            width: 240px; 
+            padding: 20px; 
+            z-index: 10; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto;
+            height: 100%;
+        }
 
-button.action { padding: 6px 12px; background: #00c6ff; border: none; border-radius: 6px; color: white; cursor: pointer; margin-right: 5px; }
-.logout { background: #e74c3c !important; color: white !important; }
-.toggle-mode { background: #f39c12 !important; font-weight: bold; margin-top: 20px !important; }
+        .sidebar button { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 5px 0; 
+            border: none; 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-align: left; 
+            font-size: 14px;
+            transition: 0.3s;
+        }
 
-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-.total-box { font-size: 18px; margin-top: 10px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; border-left: 5px solid #ffcc00; }
-.pending-badge { background: #ffcc00; color: black; padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        /* --- MOBILE RESPONSIVE UI --- */
+        @media (max-width: 768px) {
+            .main { flex-direction: column; }
+            .sidebar-container { 
+                border-bottom: 2px solid var(--border-color);
+                padding-right: 45px; /* Creates a dedicated safe zone for the arrow */
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 12px;
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                gap: 10px;
+                scrollbar-width: none;
+                /* Subtle fade effect so text doesn't hit the arrow directly */
+                -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+                mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            }
+            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar h3 { display: none; }
+            .sidebar button { width: auto; padding: 10px 18px; margin: 0; flex-shrink: 0; }
+            
+            .scroll-hint { display: flex !important; } 
+            .content { padding: 15px; }
+            input[type="number"] { max-width: 100%; width: 100%; font-size: 16px; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+        }
 
-/* Audit Log Styling */
-.history-log { margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; max-height: 200px; overflow-y: auto; font-size: 13px; border: 1px dashed #ffcc00; }
-.history-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffcc00; }
-</style>
+        /* --- THE ANIMATED ARROW --- */
+        .scroll-hint {
+            display: none; /* Hidden on desktop */
+            position: absolute;
+            right: 8px; /* Locked in the safe zone margin */
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-yellow);
+            color: #1e3c72;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+            z-index: 100;
+            pointer-events: none;
+            animation: bounceRight 1.2s infinite;
+        }
+
+        @keyframes bounceRight {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(5px); }
+        }
+
+        /* --- STANDARD DASHBOARD ELEMENTS --- */
+        .content { flex: 1; padding: 30px; overflow-y: auto; width: 100%; }
+        .card { background: var(--card-bg); padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input[type="number"] { padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); margin: 5px 0; }
+        button.action { padding: 10px 16px; background: #00c6ff; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 5px 5px 5px 0; font-weight: 600; }
+        table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        .total-box { font-size: 18px; margin-top: 10px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; border-left: 5px solid var(--accent-yellow); }
+        .pending-badge { background: var(--accent-yellow); color: black; padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .logout { background: #e74c3c !important; color: white !important; }
+        .toggle-mode { background: #f39c12 !important; font-weight: bold; margin-top: auto !important; }
+        .history-log { margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; max-height: 200px; overflow-y: auto; font-size: 13px; border: 1px dashed var(--accent-yellow); }
+        .history-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--accent-yellow); }
+    </style>
 </head>
 
 <body>
@@ -117,23 +194,26 @@ th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--borde
 
 <div class="dashboard" id="dashboard">
     <div class="main">
-        <div class="sidebar">
-            <h3 id="roleTitle" style="color: white; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px;"></h3>
-            <button onclick="showSection('stockSection')" id="stockBtn">📦 Add Stock 🐔</button>
-            <button onclick="showSection('sellSection')">💰 Sell Items 🥚</button>
-            <button onclick="showSection('recordSection')">📊 Sales Records</button>
-            <button onclick="showSection('profitSection')" id="profitBtn">📈 Profit & Loss</button>
-            <button onclick="resetData()" id="resetBtn">⚠️ Reset System</button>
-            <button onclick="toggleTheme()" class="toggle-mode">🌓 Switch Theme</button>
-            <button onclick="logout()" class="logout">🚪 Logout</button>
+        <div class="sidebar-container">
+            <div class="sidebar" id="mainSidebar">
+                <h3 id="roleTitle" style="color: white; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px;"></h3>
+                <button onclick="showSection('stockSection')" id="stockBtn">📦 Add Stock</button>
+                <button onclick="showSection('sellSection')">💰 Sell Items</button>
+                <button onclick="showSection('recordSection')">📊 Records</button>
+                <button onclick="showSection('profitSection')" id="profitBtn">📈 Profit/Loss</button>
+                <button onclick="resetData()" id="resetBtn" style="color:#ffcc00">⚠️ Reset</button>
+                <button onclick="toggleTheme()" class="toggle-mode">🌓 Theme</button>
+                <button onclick="logout()" class="logout">🚪 Logout</button>
+            </div>
+            <div class="scroll-hint" id="scrollHint">➔</div>
         </div>
 
         <div class="content">
             <div id="approvalSection" class="card" style="display:none; border-left: 5px solid #ffcc00;">
-                <h2 style="color: #ffcc00;">⏳ Pending Edit Approvals</h2>
+                <h2 style="color: #ffcc00;">⏳ Pending Approvals</h2>
                 <table>
                     <thead>
-                        <tr><th>Date</th><th>Item</th><th>Old Qty</th><th>New Qty</th><th>Action</th></tr>
+                        <tr><th>Date</th><th>Item</th><th>Old</th><th>New</th><th>Action</th></tr>
                     </thead>
                     <tbody id="approvalTable"></tbody>
                 </table>
@@ -167,14 +247,14 @@ th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--borde
                 <h4 style="margin-top:20px;">Sell Eggs</h4>
                 <input type="number" id="sellEggQty" placeholder="Qty">
                 <button class="action" onclick="sellEgg()">Sell Eggs</button>
-                <div class="total-box" style="margin-top:20px;">Revenue: ₹<span id="totalAmountDisplay">0</span></div>
+                <div class="total-box" style="margin-top:20px;">Total Sales: ₹<span id="totalAmountDisplay">0</span></div>
             </div>
 
             <div id="recordSection" class="card" style="display:none;">
                 <h2>📊 Sales Records</h2>
                 <div style="margin-bottom: 15px;">
-                    <button class="action" onclick="downloadCSV()">Download CSV</button>
-                    <button class="action" style="background:#28a745" onclick="downloadExcel()">Download Excel</button>
+                    <button class="action" onclick="downloadCSV()">CSV</button>
+                    <button class="action" style="background:#28a745" onclick="downloadExcel()">Excel</button>
                 </div>
                 <table>
                     <thead>
@@ -183,29 +263,31 @@ th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--borde
                     <tbody id="recordTable"></tbody>
                 </table>
                 <div id="adminHistoryCard" class="history-log" style="display:none;">
-                    <h4>🕒 Audit History (Admin Only)</h4>
+                    <h4>🕒 Audit History</h4>
                     <div id="historyItems"></div>
                 </div>
             </div>
 
             <div id="profitSection" class="card" style="display:none;">
                 <h2>📈 Profit & Loss</h2>
-                <input type="number" id="inventoryCost" placeholder="Inventory Costs">
-                <input type="number" id="employeeSalary" placeholder="Employee Salary">
+                <input type="number" id="inventoryCost" placeholder="Misc Costs">
+                <input type="number" id="employeeSalary" placeholder="Salary/Labour">
                 <button class="action" onclick="calculateProfit()">Calculate</button>
                 <div class="total-box" style="margin-top: 20px;">
-                    <p>Total Sales: ₹<span id="profitSales">0</span></p>
+                    <p>Total Revenue: ₹<span id="profitSales">0</span></p>
                     <p>Total Expenses: ₹<span id="totalExpenses">0</span></p>
                     <p style="font-weight: bold; color: #ffcc00;">Net Profit: ₹<span id="netProfit">0</span></p>
                 </div>
-                <canvas id="profitChart" height="100"></canvas>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="profitChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// --- UI ENHANCEMENTS ---
+// UI ENHANCEMENTS
 function createIcons() {
     const container = document.getElementById('bgIcons');
     const icons = ['🐔', '🥚', '🍗', '🐣'];
@@ -220,6 +302,12 @@ function createIcons() {
     }
 }
 createIcons();
+
+// Hide scroll hint once user actually scrolls
+document.getElementById('mainSidebar').addEventListener('scroll', function() {
+    const hint = document.getElementById('scrollHint');
+    if (hint) hint.style.display = 'none';
+}, { once: true });
 
 function toggleTheme() {
     document.body.classList.toggle('light-mode');
@@ -339,7 +427,7 @@ function editRecord(index) {
     if (role === "admin") applyEdit(index, newQty, "Admin Direct Edit");
     else {
         pendingApprovals.push({ recordIndex: index, oldQty: records[index].qty, newQty: newQty, item: records[index].item, date: new Date().toLocaleString() });
-        saveData(); updateTable(); alert("Sent for Approval!");
+        saveData(); updateTable(); alert("Modification sent for approval!");
     }
 }
 
@@ -349,7 +437,7 @@ function applyEdit(index, newQty, source) {
     let rate = (r.item === "Chicken") ? chickenRate : eggRate;
     if (r.item === "Chicken") chickenStock -= diff; else eggStock -= diff;
     r.qty = newQty; r.amt = newQty * rate;
-    historyLogs.unshift(`${new Date().toLocaleString()}: [${source}] ${r.item} Changed to ${newQty}`);
+    historyLogs.unshift(`${new Date().toLocaleString()}: [${source}] ${r.item} Updated to ${r.qty}`);
     saveData(); updateTable(); updateTotals(); updateHistory();
 }
 
@@ -393,16 +481,15 @@ function calculateProfit() {
     let exp = inv + sal;
     let net = sales - exp;
     
-    // Update the UI Text
     document.getElementById("profitSales").innerText = sales.toFixed(2);
     document.getElementById("totalExpenses").innerText = exp.toFixed(2);
     document.getElementById("netProfit").innerText = net.toFixed(2);
     
-    // Update Chart
     if (chart) chart.destroy();
     chart = new Chart(document.getElementById("profitChart"), {
         type: 'bar',
-        data: { labels: ["Sales", "Expenses", "Net Profit"], datasets: [{ data: [sales, exp, net], backgroundColor: ["#2ecc71", "#e74c3c", "#3498db"] }] }
+        data: { labels: ["Revenue", "Expenses", "Net Profit"], datasets: [{ data: [sales, exp, net], backgroundColor: ["#2ecc71", "#e74c3c", "#3498db"] }] },
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
